@@ -11,7 +11,6 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { clock } from './utils/canvas.texture'
 import Game from './utils/game'
 
 import Store from './store/index.js'
@@ -20,9 +19,6 @@ const Pinia  = Store()
 const score = computed(() => Pinia.useAppStore.getScore)
 
 onMounted (()=>{
-  // new JumpGame().start();
-  clock()
-
   var game = new Game()
   game.init()
   game.addSuccessFn(success)
@@ -30,6 +26,7 @@ onMounted (()=>{
 })
 
 const success = (score) => {
+  console.log(score)
 	// var scoreCurrent = document.querySelector('.score-current')
 	// scoreCurrent.innerText = score;
 	// // 记录最高分
@@ -45,6 +42,7 @@ const success = (score) => {
 }
 
 const failed = () => {
+  console.log('fail')
 	// score.innerText = game.score
 	// mask.style.display = 'flex'
 }

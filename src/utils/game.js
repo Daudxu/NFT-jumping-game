@@ -1,9 +1,10 @@
 import * as THREE from 'three'
-
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 export default class Game  {
   constructor() {
       this.config = {
-          isMobile: true,
+          isMobile: false,
           helper: false, // 默认关闭helper
           background: 0x282828, // 背景颜色
           ground: -1, // 地面y坐标
@@ -30,7 +31,7 @@ export default class Game  {
       }
       this.camera = new THREE.OrthographicCamera(this.size.width / -80, this.size.width / 80, this.size.height / 80, this.size.height / -80, 0, 5000)
       this.renderer = new THREE.WebGLRenderer({antialias: true})
-
+      this.model = null
       var planceGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height);    // PlaneGeometry: 翻译 平面几何    (参数: 宽60, 高20)
       var planeMaterial = new THREE.MeshLambertMaterial({ color: 0xdddddd });    // MeshLambertMaterial: 翻译 网格材质    (用来设置平面的外观, 颜色，透明度等)
       var plane = new THREE.Mesh(planceGeometry, planeMaterial);    // 把这2个对象合并到一个名为plane(平面)的Mesh(网格)对象中
@@ -41,6 +42,7 @@ export default class Game  {
       plane.position.z = 0;
       this.plane = plane;
       this.scene.add(this.plane);    // 将平面添加到场景
+      this.scene.background = new THREE.Color(0x0000ff)
 
 
       this.cubes = [] // 方块数组
@@ -91,8 +93,8 @@ export default class Game  {
         // 事件绑定到canvas中
         var canvas = document.querySelector('canvas')
         canvas.addEventListener(mouseEvents.down, function () {
-          // console.log('mousedown');
-          self._handleMousedown()
+      
+           self._handleMousedown()
         })
         // 监听鼠标松开的事件
         canvas.addEventListener(mouseEvents.up, function (evt) {
@@ -173,7 +175,7 @@ export default class Game  {
       **/
       _handleMousedown () {
         var self = this
-    
+  
         function act() {
         // if (!self.jumperStat.ready && self.jumper.scale.y > 0.02) {
           // 以jumperBody蓄力一半为最大值
@@ -259,31 +261,20 @@ export default class Game  {
         }
     
         function landed() {
-    
-          // 用于测试combo，手动设置掉到正中心
-          // self.jumper.position.x = self.cubes[self.cubes.length - 1].position.x;
-          // self.jumper.position.z =  self.cubes[self.cubes.length - 1].position.z;
-    
-          // jumper掉落到方块水平位置，开始充值状态，并开始判断掉落是否成功
           self.jumperStat.ready = false
           self.jumperStat.xSpeed = 0
           self.jumperStat.ySpeed = 0
           self.jumper.position.y = .5
-          // 还原jumper的旋转角度和head的位置
           self.jumper.rotation.z = 0
           self.jumper.rotation.x = 0
-          // self.jumperHead.position.y = 0
     
           self._checkInCube();
     
           if (self.falledStat.location === 1) {
-            // 播放掉落成功音效
-            // if(ActMusic){
-            var ActMusic = new Audio('./jump.mp3');
+            var ActMusic = new Audio('./audio/jump.mp3');
             ActMusic.volume = .05;
             ActMusic.loop = false;
             ActMusic.play();
-            // }
     
             // 掉落成功，进入下一步
             self.score += Math.pow(2, self.combo); // 随着combo
@@ -294,13 +285,13 @@ export default class Game  {
               self.successCallback(self.score)
             }
           } else {
-            // 掉落失败，进入失败动画
             self._falling();
-            var FallMusic = new Audio('./fall.mp3');
+            var FallMusic = new Audio('./audio/fall.mp3');
             FallMusic.volume = .05;
             FallMusic.loop = false;
           }
         }
+    
         act();
       }
       /**
@@ -506,25 +497,41 @@ export default class Game  {
       // 初始化jumper：游戏主角
       _createJumper () {
         var self = this
+        let model = null
+        let dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath("./draco/gltf/");
+        dracoLoader.setDecoderConfig({type: "js"});
+        let loader = new  GLTFLoader();
+        loader.setDRACOLoader(loader);
+        loader.load("./1.glb", (gltf) => {
+            gltf.scene.scale.set(2.5, 2.5, 2.5)
+            gltf.scene.position.set(0, 1, 0)
+            gltf.scene.rotation.y = Math.PI / 2
+            console.log(gltf);
+            this.scene.add(gltf.scene)
+            model = gltf.scene
+        })
+        this.model = model
+        // console.log('this.model', model)
+        // const geometry = new THREE.BoxGeometry( 1, 10, 1 );
+        // const materiala = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+        // const cube = new THREE.Mesh( geometry, materiala );
+        // this.scene.add( cube );
+
         var material = new THREE.MeshLambertMaterial({color: this.config.jumperColor})
         var bodyGeometry = new THREE.CylinderGeometry(this.config.jumperWidth/3,this.config.jumperDeep/2,this.config.jumperHeight, 40)
-        var headGeometry = new THREE.SphereGeometry( this.config.jumperDeep/2, 32, 32 );
         bodyGeometry.translate(0 , 1, 0 )
-        headGeometry.translate(0, 2.4, 0);
         this.jumperBody = new THREE.Mesh(bodyGeometry, material);
-        // this.jumperHead = new THREE.Mesh(headGeometry, material);
         this.jumperBody.castShadow = true; // 产生阴影
-        // this.jumperHead.castShadow = true; // 产生阴影
     
         var mesh = new THREE.Group();
         mesh.add(this.jumperBody);
-        // mesh.add(this.jumperHead);
         mesh.position.y = 3;
         mesh.position.x = this.config.jumperWidth / 2;
         mesh.position.z = this.config.jumperWidth / 2;
     
         this.jumper = mesh
-        this.scene.add(this.jumper);
+        // this.scene.add(this.jumper);
     
         this.directionalLight.target = this.jumper; // 将平行光跟随jumper
     
