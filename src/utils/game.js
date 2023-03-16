@@ -181,13 +181,15 @@ export default class Game  {
           // 以jumperBody蓄力一半为最大值
           if (!self.jumperStat.ready && self.jumperBody.scale.y > 0.02 &&  self.jumperBody.scale.y >= 0.5) {
             self.jumperBody.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
+            // self.model.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
             // self.jumper.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
             // self.jumperHead.position.y -= 0.02 // jumper头部跟随下降
-    
+             console.log(self.model)
             self.jumperStat.xSpeed += 0.004
             self.jumperStat.ySpeed += 0.008
     
             self.jumperStat.yTimes = (1 - self.jumperBody.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
+            // self.jumperStat.yTimes = (1 - self.model.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
             // console.log( self.jumperBody.scale.y, self.jumperStat.yTimes );
     
             self.mouseDownFrameHandler =  requestAnimationFrame(act);
@@ -246,6 +248,7 @@ export default class Game  {
             // 运动伴随着缩放
             if ( self.jumperBody.scale.y < 1 ) {
               self.jumperBody.scale.y += 0.02;
+              // self.model.scale.y += 0.02;
               // self.jumperHead.position.y += 0.02 // 头部跟随上升
             }
             // jumper在垂直方向上先上升后下降
@@ -501,15 +504,24 @@ export default class Game  {
         let loader = new  GLTFLoader();
         loader.setDRACOLoader(loader);
         loader.load("./1.glb", (gltf) => {
+            gltf.scene.traverse(c => {
+                c.castShadow = true;
+            });
             gltf.scene.scale.set(2.5, 2.5, 2.5)
             gltf.scene.position.set(0, 1, 0)
             gltf.scene.rotation.y = Math.PI / 2
-       
-            // this.scene.add(gltf.scene)
+            const clip = gltf.animations[0]
+            const mixer = new THREE.AnimationMixer(gltf.scene)
+            mixer.timeScale=1/5;
+            const action = mixer.clipAction(clip)
+            action.play()
+            this.scene.add(gltf.scene)
             model = gltf.scene
         })
-        this.model = model
-        console.log(this.model);
+   
+
+        this.model = 123123
+        // console.log(this.model);
         // console.log('this.model', model)
         // const geometry = new THREE.BoxGeometry( 1, 10, 1 );
         // const materiala = new THREE.MeshBasicMaterial( {color: 0x00ff00} );

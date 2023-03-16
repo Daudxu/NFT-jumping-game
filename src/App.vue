@@ -2,16 +2,15 @@
   <div class="score-panel">{{ scoreSum }}</div>
   <div class="cl-start-shade" v-if="isStart === 0">
      <div class="cl-start-main"> 
-          <div class="cl-title"> jump jump jump </div>
+          <div class="cl-title"> jump</div>
           <div class="cl-button" @click="handleClickStart">start</div>
      </div>
   </div>
-  <!-- <div class="cl-restart" v-if="isFail === 0"> -->
-    <div class="cl-restart" v-if="isFail === 1">
-          <div class="cl-panel-score"> {{ scoreSum }} </div>
-          <a class="cl-button" @click="handleClickRestart">
-            <span>Restart </span>
-          </a>
+  <div class="cl-restart" v-if="isFail === 1">
+      <div class="cl-panel-score"> {{ scoreSum }} </div>
+      <a class="cl-button" @click="handleClickRestart">
+        <span>Restart </span> 
+      </a>
   </div>
 </template>
 
