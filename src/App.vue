@@ -6,7 +6,13 @@
           <div class="cl-button" @click="handleClickStart">start</div>
      </div>
   </div>
-
+  <!-- <div class="cl-restart" v-if="isFail === 0"> -->
+    <div class="cl-restart" v-if="isFail === 1">
+          <div class="cl-panel-score"> {{ scoreSum }} </div>
+          <a class="cl-button" @click="handleClickRestart">
+            <span>Restart </span>
+          </a>
+  </div>
 </template>
 
 <script setup>
@@ -18,6 +24,7 @@ import Store from './store/index.js'
 const Pinia  = Store()
 const scoreSum = computed(() => Pinia.useAppStore.getScore)
 const isStart = ref(0)
+const isFail = ref(0)
 const bgm = new Audio('./audio/bgm.mp3');
 const fallMusic = new Audio('./audio/fall.mp3');
 onMounted (()=>{
@@ -25,6 +32,10 @@ onMounted (()=>{
   game.init()
   game.addSuccessFn(success)
   game.addFailedFn(failed)
+
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  })
 })
 
 const success = (score) => {
@@ -32,14 +43,12 @@ const success = (score) => {
 }
 
 const failed = () => {
+  isFail.value = 1
   fallMusic.volume = 0.75;
   fallMusic.loop = false;
   fallMusic.play()
   bgm.pause()
-
 }
-
-
 
 const handleClickStart = () => {
   isStart.value = 1
@@ -52,6 +61,11 @@ const audioBgm = () => {
   bgm.loop = true;
   Pinia.useAppStore.setBgm(bgm)
 }
+
+const handleClickRestart = () => {
+
+}
+
 </script>
 <style lang="stylus" scoped>
   @font-face {
@@ -103,8 +117,8 @@ const audioBgm = () => {
 }
 
 
-.mask{
-	display: none;
+.cl-restart{
+  display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
@@ -112,6 +126,26 @@ const audioBgm = () => {
 	width: 100%;
 	height: 100%;
 	background: rgba(0,0,0,0.4);
+  z-index: 9999;
+  .cl-panel-score {
+    font-size: 77px;
+    font-family: myFirstFont;
+    color: #ffffff
+    margin-bottom: 77px
+  }
+  .cl-button {
+    font-size: 26px;
+    font-weight: 600;
+    width: 150px;
+    height: 60px;
+    line-height: 60px;
+    color: #ffffff;
+    background: #232323;
+    border-radius: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 .content{
 	display: flex;
