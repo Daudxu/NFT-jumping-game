@@ -12,7 +12,7 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 import { clock } from './utils/canvas.texture'
-import { Game } from './utils/game'
+import Game from './utils/game'
 
 import Store from './store/index.js'
 
@@ -28,6 +28,26 @@ onMounted (()=>{
   game.addSuccessFn(success)
   game.addFailedFn(failed)
 })
+
+const success = (score) => {
+	// var scoreCurrent = document.querySelector('.score-current')
+	// scoreCurrent.innerText = score;
+	// // 记录最高分
+	// var record = document.querySelector('.record');
+	// var item = 'JUMP_KING_RECORD_SCORE';
+	// var itemScore = parseInt(localStorage.getItem(item) || 0);
+	// if( itemScore < score){
+	// 	localStorage.setItem(item, score);
+	// 	record.innerText = score;
+	// }else{
+	// 	record.innerText = itemScore;
+	// }
+}
+
+const failed = () => {
+	// score.innerText = game.score
+	// mask.style.display = 'flex'
+}
 
 const isStart = ref(0)
 
