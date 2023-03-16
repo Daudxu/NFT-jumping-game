@@ -272,7 +272,7 @@ export default class Game  {
     
           if (self.falledStat.location === 1) {
             var ActMusic = new Audio('./audio/jump.mp3');
-            ActMusic.volume = .05;
+            ActMusic.volume = 0.75;
             ActMusic.loop = false;
             ActMusic.play();
     
@@ -286,9 +286,6 @@ export default class Game  {
             }
           } else {
             self._falling();
-            var FallMusic = new Audio('./audio/fall.mp3');
-            FallMusic.volume = .05;
-            FallMusic.loop = false;
           }
         }
     
@@ -507,11 +504,12 @@ export default class Game  {
             gltf.scene.scale.set(2.5, 2.5, 2.5)
             gltf.scene.position.set(0, 1, 0)
             gltf.scene.rotation.y = Math.PI / 2
-            console.log(gltf);
-            this.scene.add(gltf.scene)
+       
+            // this.scene.add(gltf.scene)
             model = gltf.scene
         })
         this.model = model
+        console.log(this.model);
         // console.log('this.model', model)
         // const geometry = new THREE.BoxGeometry( 1, 10, 1 );
         // const materiala = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
@@ -531,7 +529,7 @@ export default class Game  {
         mesh.position.z = this.config.jumperWidth / 2;
     
         this.jumper = mesh
-        // this.scene.add(this.jumper);
+        this.scene.add(this.jumper);
     
         this.directionalLight.target = this.jumper; // 将平行光跟随jumper
     

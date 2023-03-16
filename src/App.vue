@@ -1,5 +1,5 @@
 <template>
-  <div class="score-panel">{{ score }}</div>
+  <div class="score-panel">{{ scoreSum }}</div>
   <div class="cl-start-shade" v-if="isStart === 0">
      <div class="cl-start-main"> 
           <div class="cl-title"> jump jump jump </div>
@@ -16,8 +16,10 @@ import Game from './utils/game'
 import Store from './store/index.js'
 
 const Pinia  = Store()
-const score = computed(() => Pinia.useAppStore.getScore)
-
+const scoreSum = computed(() => Pinia.useAppStore.getScore)
+const isStart = ref(0)
+const bgm = new Audio('./audio/bgm.mp3');
+const fallMusic = new Audio('./audio/fall.mp3');
 onMounted (()=>{
   var game = new Game()
   game.init()
@@ -26,28 +28,18 @@ onMounted (()=>{
 })
 
 const success = (score) => {
-  console.log(score)
-	// var scoreCurrent = document.querySelector('.score-current')
-	// scoreCurrent.innerText = score;
-	// // 记录最高分
-	// var record = document.querySelector('.record');
-	// var item = 'JUMP_KING_RECORD_SCORE';
-	// var itemScore = parseInt(localStorage.getItem(item) || 0);
-	// if( itemScore < score){
-	// 	localStorage.setItem(item, score);
-	// 	record.innerText = score;
-	// }else{
-	// 	record.innerText = itemScore;
-	// }
+  Pinia.useAppStore.setScore(score)
 }
 
 const failed = () => {
-  console.log('fail')
-	// score.innerText = game.score
-	// mask.style.display = 'flex'
+  fallMusic.volume = 0.75;
+  fallMusic.loop = false;
+  fallMusic.play()
+  bgm.pause()
+
 }
 
-const isStart = ref(0)
+
 
 const handleClickStart = () => {
   isStart.value = 1
@@ -55,8 +47,7 @@ const handleClickStart = () => {
 }
 
 const audioBgm = () => {
-	var bgm = new Audio('./audio/bgm.mp3');
-	bgm.volume = 0.75
+	bgm.volume = 0.5
 	bgm.play();
   bgm.loop = true;
   Pinia.useAppStore.setBgm(bgm)
