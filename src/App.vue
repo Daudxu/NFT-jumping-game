@@ -27,8 +27,8 @@ const isStart = ref(0)
 const isFail = ref(0)
 const bgm = new Audio('./audio/bgm.mp3');
 const fallMusic = new Audio('./audio/fall.mp3');
+const game = new Game()
 onMounted (()=>{
-  var game = new Game()
   game.init()
   game.addSuccessFn(success)
   game.addFailedFn(failed)
@@ -63,7 +63,9 @@ const audioBgm = () => {
 }
 
 const handleClickRestart = () => {
-
+  game.restart()
+  isFail.value = 0
+  bgm.play();
 }
 
 </script>
