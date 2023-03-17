@@ -21,5 +21,5 @@ export  {
     CUBE_WIDTH,
     CUBE_HEIGHT,
     CUBE_DEEP,
-    JUMPER_WIDTH
+    JUMPER_WIDTH,
 }

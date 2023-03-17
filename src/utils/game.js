@@ -191,7 +191,7 @@ export default class Game  {
             self.jumperStat.ySpeed += 0.008
     
             // self.jumperStat.yTimes = (1 - self.jumperBody.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
-            self.jumperStat.yTimes = (1 - self.model.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
+            self.jumperStat.yTimes = (1 - self.jumper.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
             // console.log( self.jumperBody.scale.y, self.jumperStat.yTimes );
     
             self.mouseDownFrameHandler =  requestAnimationFrame(act);
@@ -722,7 +722,7 @@ export default class Game  {
         }
     
         function Chess() {
-          var texture = new THREE.TextureLoader().load('./textures/ice.jpg');
+          var texture = new THREE.TextureLoader().load('./textures/ice.png');
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
           texture.repeat.set(1, 1); // 设置重复次数
           return {
@@ -731,7 +731,7 @@ export default class Game  {
           }
         }
         function Snow() {
-          var texture = new THREE.TextureLoader().load('./textures/Snow.jpg');
+          var texture = new THREE.TextureLoader().load('./textures/box.jpg');
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
           texture.repeat.set(1, 1); // 设置重复次数
           return {
