@@ -508,7 +508,7 @@ export default class Game  {
               });
               gltf.scene.scale.set(2.2, 2.2, 2.2)
               gltf.scene.position.set(0, 0, 0)
-              gltf.scene.rotation.y = Math.PI / 2
+              gltf.scene.rotation.y = Math.PI 
               const clip = gltf.animations[0]
               const mixer = new THREE.AnimationMixer(gltf.scene)
               mixer.timeScale=1/5;
