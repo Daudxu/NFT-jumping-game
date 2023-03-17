@@ -37,7 +37,7 @@ export default class Game  {
       this.renderer = new THREE.WebGLRenderer({antialias: true})
       this.model = null
       const bgTextureLoader = new THREE.TextureLoader();
-      const bgTexture = bgTextureLoader.load('./bg.jpg');
+      const bgTexture = bgTextureLoader.load('./textures/bg.jpg');
       // this.scene.background = texture
       var planceGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height);   
       var planeMaterial = new THREE.MeshLambertMaterial({ 
@@ -726,7 +726,7 @@ export default class Game  {
         }
     
         function Chess() {
-          var texture = new THREE.TextureLoader().load('./ice.jpg');
+          var texture = new THREE.TextureLoader().load('./textures/ice.jpg');
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
           texture.repeat.set(1, 1); // 设置重复次数
           return {
