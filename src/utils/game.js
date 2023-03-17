@@ -2,44 +2,39 @@ import * as THREE from 'three'
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import Snow from "./snow";
+import { IS_HELPER, BACKGROUND, GROUND, FALLING_SPEED, CUBE_COLOR, CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEEP, JUMPER_WIDTH } from "../config/settings";
 // import snowImg from "../textures/snow.png"
 export default class Game  {
   constructor() {
       this.config = {
-          isMobile: false, 
-          helper: false, // 是否开启辅助坐标坐标
-          background: 0x282828, // 背景颜色
-          ground: -1, // 地面y坐标
-          fallingSpeed: 0.2, // 游戏失败掉落速度
-          cubeColor: 0xbebebe,
-          cubeWidth: 3, // 方块宽度
-          cubeHeight: 1, // 方块高度
-          cubeDeep: 3, // 方块深度
-          jumperColor: 0x333333,
-          jumperWidth: 1, // jumper宽度
-          jumperHeight: 2, // jumper高度
-          jumperDeep: 1, // jumper深度
+          isMobile: false,
       }
       this.score = 0
       this.size = {
         width: window.innerWidth,
         height: window.innerHeight
       }
+      // 场景
       this.scene = new THREE.Scene()
       this.snow = new Snow(10000, 100, './textures/snow.png')
       this.scene.add(this.snow.particle)
-
-      this.cameraPos = {
-        current: new THREE.Vector3(0, 0, 0), // 摄像机当前的坐标
-        next: new THREE.Vector3() // 摄像机即将要移到的位置
-      }
+      // 相机
       this.camera = new THREE.OrthographicCamera(this.size.width / -80, this.size.width / 80, this.size.height / 80, this.size.height / -80, 0, 5000)
+      // 相机坐标位置配置
+      this.cameraPos = {
+         current: new THREE.Vector3(0, 0, 0), // 摄像机当前的坐标
+         next: new THREE.Vector3() // 摄像机即将要移到的位置
+      }
+      // 渲染器
       this.renderer = new THREE.WebGLRenderer({antialias: true})
       this.renderer.outputEncoding = THREE.sRGBEncoding
+      // 人物模型
       this.model = null
       const bgTextureLoader = new THREE.TextureLoader();
-      const bgTexture = bgTextureLoader.load('./textures/bg.jpg');
-      // this.scene.background = texture
+      const bgTexture = bgTextureLoader.load('./textures/bg2.jpg');
+      bgTexture.wrapS = bgTexture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
+      bgTexture.repeat.set(50, 50); 
+      
       var planceGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height);   
       var planeMaterial = new THREE.MeshLambertMaterial({ 
             map:bgTexture
@@ -85,7 +80,7 @@ export default class Game  {
         this._createJumper() // 加入游戏者jumper
         this._updateCamera() // 更新相机坐标
     
-        if(this.config.helper){  // 开启helper
+        if(IS_HELPER){ 
           this._createHelpers();
         }
     
@@ -303,11 +298,11 @@ export default class Game  {
       **/
       _fallingRotate (dir) {
         var self = this
-        var offset = self.falledStat.distance - self.config.cubeWidth / 2
+        var offset = self.falledStat.distance - CUBE_WIDTH / 2
         var rotateAxis = 'z' // 旋转轴
         var rotateAdd = self.jumper.rotation[rotateAxis] + 0.1 // 旋转速度
         var rotateTo = self.jumper.rotation[rotateAxis] < Math.PI/2 // 旋转结束的弧度
-        var fallingTo = self.config.ground + self.config.jumperWidth / 2 + offset
+        var fallingTo = GROUND + JUMPER_WIDTH / 2 + offset
     
         if (dir === 'rightTop') {
           rotateAxis = 'x'
@@ -343,7 +338,7 @@ export default class Game  {
           if (rotateTo) {
             self.jumper.rotation[rotateAxis] = rotateAdd
           } else if (self.jumper.position.y > fallingTo) {
-            self.jumper.position.y -= self.config.fallingSpeed
+            self.jumper.position.y -= FALLING_SPEED
           } else {
             self.fallingStat.end = true
           }
@@ -426,16 +421,16 @@ export default class Game  {
             distanceS = Math.abs(pointO.z - pointA.z)
             distanceL = Math.abs(pointO.z - pointB.z)
           }
-          var should = this.config.cubeWidth / 2 + this.config.jumperWidth /2
+          var should = CUBE_WIDTH / 2 + JUMPER_WIDTH /2
           var result = 0
           if (distanceS < should ) {
             // 落在当前方块，将距离储存起来，并继续判断是否可以站稳
             this.falledStat.distance = distanceS
-            result = distanceS < this.config.cubeWidth / 2 ? -1 : -10
+            result = distanceS < CUBE_WIDTH / 2 ? -1 : -10
           } else if (distanceL < should) {
             this.falledStat.distance = distanceL
             // 落在下一个方块，将距离储存起来，并继续判断是否可以站稳
-            result = distanceL < this.config.cubeWidth / 2 ? 1 : 10
+            result = distanceL < CUBE_WIDTH / 2 ? 1 : 10
     
             if(pointO.x == pointB.x && pointO.z == pointB.z){
               this.combo++;
@@ -528,8 +523,8 @@ export default class Game  {
         var mesh = new THREE.Group();
         mesh.add(this.model);
         mesh.position.y = 3;
-        mesh.position.x = this.config.jumperWidth / 2;
-        mesh.position.z = this.config.jumperWidth / 2;
+        mesh.position.x = JUMPER_WIDTH / 2;
+        mesh.position.z = JUMPER_WIDTH / 2;
         this.jumper = mesh
         this.scene.add(this.jumper);
     
@@ -601,7 +596,7 @@ export default class Game  {
       }
       _setRenderer () {
         this.renderer.setSize(this.size.width, this.size.height)
-        this.renderer.setClearColor(this.config.background)
+        this.renderer.setClearColor(BACKGROUND)
         this.renderer.shadowMap.enabled = true; // 开启阴影
     
         document.body.appendChild(this.renderer.domElement)
@@ -615,7 +610,7 @@ export default class Game  {
          // 所有的材质数组
         var materials = [
           // {
-          //   material : new THREE.MeshLambertMaterial({color: config.cubeColor}),
+          //   material : new THREE.MeshLambertMaterial({color: CUBE_COLOR}),
           //   type: 'DefaultCubeColor'
           // },
           // RandomColor(),
@@ -625,9 +620,9 @@ export default class Game  {
           Chess(), 
           Chess(),
           Chess(),
-          Chess(),
-          Chess(),
-          Chess(),
+          Snow(),
+          Snow(),
+          Snow(),
           // wireFrame(),
         ];
     
@@ -646,12 +641,12 @@ export default class Game  {
           // texture.needsUpdate = true;
           const boxTextureLoader = new THREE.TextureLoader();
           const boxTexture = boxTextureLoader.load('./bg.jpg');
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
           matArray.push(new THREE.MeshBasicMaterial({ map: boxTexture }));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
     
           return {
             material : matArray,
@@ -680,12 +675,12 @@ export default class Game  {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
           texture.repeat.set(5,5); // 设置重复次数都为4
     
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
           matArray.push(new THREE.MeshBasicMaterial({ map: texture }));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
     
           return {
             material : matArray,
@@ -713,12 +708,12 @@ export default class Game  {
           var texture = new THREE.Texture(canvas);
           texture.needsUpdate = true;
     
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
           matArray.push(new THREE.MeshBasicMaterial({ map: texture }));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
+          matArray.push(new THREE.MeshLambertMaterial({color: CUBE_COLOR}));
     
           return {
             material : matArray,
@@ -728,6 +723,15 @@ export default class Game  {
     
         function Chess() {
           var texture = new THREE.TextureLoader().load('./textures/ice.jpg');
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
+          texture.repeat.set(1, 1); // 设置重复次数
+          return {
+            material : new THREE.MeshBasicMaterial( { map: texture } ),
+            type : 'Chess'
+          }
+        }
+        function Snow() {
+          var texture = new THREE.TextureLoader().load('./textures/Snow.jpg');
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
           texture.repeat.set(1, 1); // 设置重复次数
           return {
@@ -747,7 +751,7 @@ export default class Game  {
     
         function wireFrame(){
           return {
-            material: new THREE.MeshLambertMaterial({color: config.cubeColor, wireframe: true}),
+            material: new THREE.MeshLambertMaterial({color: CUBE_COLOR, wireframe: true}),
             type: 'wireFrame'
           }
         }
@@ -756,10 +760,10 @@ export default class Game  {
       _createGeometry(){ // 生成几合体
         var obj = {};
         if(Math.random() > 0.5){  // 添加圆柱型方块
-          obj.geometry = new THREE.CylinderGeometry(this.config.cubeWidth / 2, this.config.cubeWidth / 2, this.config.cubeHeight, 40)
+          obj.geometry = new THREE.CylinderGeometry(CUBE_WIDTH / 2, CUBE_WIDTH / 2, CUBE_HEIGHT, 40)
           obj.type = 'CylinderGeometry';
         }else{ // 方块
-          obj.geometry = new THREE.CubeGeometry(this.config.cubeWidth,this.config.cubeHeight,this.config.cubeDeep)
+          obj.geometry = new THREE.CubeGeometry(CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEEP)
           obj.type = 'CubeGeometry';
         }
         return obj;
