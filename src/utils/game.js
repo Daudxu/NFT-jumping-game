@@ -4,8 +4,8 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 export default class Game  {
   constructor() {
       this.config = {
-          isMobile: false,
-          helper: false, // 默认关闭helper
+          isMobile: false, 
+          helper: false, // 是否开启辅助坐标坐标
           background: 0x282828, // 背景颜色
           ground: -1, // 地面y坐标
           fallingSpeed: 0.2, // 游戏失败掉落速度
@@ -25,6 +25,8 @@ export default class Game  {
         height: window.innerHeight
       }
       this.scene = new THREE.Scene()
+ 
+
       this.cameraPos = {
         current: new THREE.Vector3(0, 0, 0), // 摄像机当前的坐标
         next: new THREE.Vector3() // 摄像机即将要移到的位置
@@ -32,8 +34,13 @@ export default class Game  {
       this.camera = new THREE.OrthographicCamera(this.size.width / -80, this.size.width / 80, this.size.height / 80, this.size.height / -80, 0, 5000)
       this.renderer = new THREE.WebGLRenderer({antialias: true})
       this.model = null
-      var planceGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height);    // PlaneGeometry: 翻译 平面几何    (参数: 宽60, 高20)
-      var planeMaterial = new THREE.MeshLambertMaterial({ color: 0xdddddd });    // MeshLambertMaterial: 翻译 网格材质    (用来设置平面的外观, 颜色，透明度等)
+      const bgTextureLoader = new THREE.TextureLoader();
+      const bgTexture = bgTextureLoader.load('./bg.jpg');
+      // this.scene.background = texture
+      var planceGeometry = new THREE.PlaneGeometry(this.size.width, this.size.height);   
+      var planeMaterial = new THREE.MeshLambertMaterial({ 
+            map:bgTexture
+       });  
       var plane = new THREE.Mesh(planceGeometry, planeMaterial);    // 把这2个对象合并到一个名为plane(平面)的Mesh(网格)对象中
       plane.receiveShadow = true;    // 平面接收阴影
       plane.rotation.x = -0.5*Math.PI;    // 绕x轴旋转90度
@@ -42,7 +49,7 @@ export default class Game  {
       plane.position.z = 0;
       this.plane = plane;
       this.scene.add(this.plane);    // 将平面添加到场景
-      this.scene.background = new THREE.Color(0x0000ff)
+      // this.scene.background = new THREE.Color(0x0000ff)
 
 
       this.cubes = [] // 方块数组
@@ -175,21 +182,18 @@ export default class Game  {
       **/
       _handleMousedown () {
         var self = this
-  
         function act() {
+        
         // if (!self.jumperStat.ready && self.jumper.scale.y > 0.02) {
           // 以jumperBody蓄力一半为最大值
-          if (!self.jumperStat.ready && self.jumperBody.scale.y > 0.02 &&  self.jumperBody.scale.y >= 0.5) {
-            self.jumperBody.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
-            // self.model.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
-            // self.jumper.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
-            // self.jumperHead.position.y -= 0.02 // jumper头部跟随下降
-             console.log(self.model)
+          if (!self.jumperStat.ready  &&  self.jumper.scale.y >= 0.5) {
+       
+            self.jumper.scale.y -= 0.01  // jumper随按压时间降低高度，即减小jumper.scale.y值
             self.jumperStat.xSpeed += 0.004
             self.jumperStat.ySpeed += 0.008
     
-            self.jumperStat.yTimes = (1 - self.jumperBody.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
-            // self.jumperStat.yTimes = (1 - self.model.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
+            // self.jumperStat.yTimes = (1 - self.jumperBody.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
+            self.jumperStat.yTimes = (1 - self.model.scale.y) / 0.01; // 计算倍数, 用于jumper在y轴的旋转
             // console.log( self.jumperBody.scale.y, self.jumperStat.yTimes );
     
             self.mouseDownFrameHandler =  requestAnimationFrame(act);
@@ -246,14 +250,10 @@ export default class Game  {
             // jumper在垂直方向上运动
             self.jumper.position.y += self.jumperStat.ySpeed
             // 运动伴随着缩放
-            if ( self.jumperBody.scale.y < 1 ) {
-              self.jumperBody.scale.y += 0.02;
-              // self.model.scale.y += 0.02;
-              // self.jumperHead.position.y += 0.02 // 头部跟随上升
+            if ( self.jumper.scale.y < 1 ) {
+              self.jumper.scale.y += 0.01;
             }
-            // jumper在垂直方向上先上升后下降
             self.jumperStat.ySpeed -= 0.01
-            // 每一次的变化，渲染器都要重新渲染，才能看到渲染效果
             self._render(self.scene, self.camera)
     
             frameHandler = requestAnimationFrame(act);
@@ -495,7 +495,7 @@ export default class Game  {
           }
       }
       // 初始化jumper：游戏主角
-      _createJumper () {
+      async _createJumper () {
         var self = this
         let model = null
         let dracoLoader = new DRACOLoader();
@@ -503,48 +503,34 @@ export default class Game  {
         dracoLoader.setDecoderConfig({type: "js"});
         let loader = new  GLTFLoader();
         loader.setDRACOLoader(loader);
-        loader.load("./1.glb", (gltf) => {
-            gltf.scene.traverse(c => {
-                c.castShadow = true;
-            });
-            gltf.scene.scale.set(2.5, 2.5, 2.5)
-            gltf.scene.position.set(0, 1, 0)
-            gltf.scene.rotation.y = Math.PI / 2
-            const clip = gltf.animations[0]
-            const mixer = new THREE.AnimationMixer(gltf.scene)
-            mixer.timeScale=1/5;
-            const action = mixer.clipAction(clip)
-            action.play()
-            this.scene.add(gltf.scene)
-            model = gltf.scene
+        var objModel =  new Promise((resolve, reject) =>{
+          loader.load("./1.glb", (gltf) => {
+              gltf.scene.traverse(c => {
+                  c.castShadow = true;
+              });
+              gltf.scene.scale.set(2.2, 2.2, 2.2)
+              gltf.scene.position.set(0, 0, 0)
+              gltf.scene.rotation.y = Math.PI / 2
+              const clip = gltf.animations[0]
+              const mixer = new THREE.AnimationMixer(gltf.scene)
+              mixer.timeScale=1/5;
+              const action = mixer.clipAction(clip)
+              action.play()
+              // this.scene.add(gltf.scene)
+              model = gltf.scene
+              resolve(gltf.scene)
+          })
         })
-   
-
-        this.model = 123123
-        // console.log(this.model);
-        // console.log('this.model', model)
-        // const geometry = new THREE.BoxGeometry( 1, 10, 1 );
-        // const materiala = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-        // const cube = new THREE.Mesh( geometry, materiala );
-        // this.scene.add( cube );
-
-        var material = new THREE.MeshLambertMaterial({color: this.config.jumperColor})
-        var bodyGeometry = new THREE.CylinderGeometry(this.config.jumperWidth/3,this.config.jumperDeep/2,this.config.jumperHeight, 40)
-        bodyGeometry.translate(0 , 1, 0 )
-        this.jumperBody = new THREE.Mesh(bodyGeometry, material);
-        this.jumperBody.castShadow = true; // 产生阴影
-    
+        this.model =  await objModel
         var mesh = new THREE.Group();
-        mesh.add(this.jumperBody);
+        mesh.add(this.model);
         mesh.position.y = 3;
         mesh.position.x = this.config.jumperWidth / 2;
         mesh.position.z = this.config.jumperWidth / 2;
-    
         this.jumper = mesh
         this.scene.add(this.jumper);
     
         this.directionalLight.target = this.jumper; // 将平行光跟随jumper
-    
         function jumperInitFall() {
           if (self.jumper.position.y > 1) {
             self.jumper.position.y -= 0.1
