@@ -519,6 +519,7 @@ export default class Game  {
               resolve(gltf.scene)
           })
         })
+        
         this.model =  await objModel
         var mesh = new THREE.Group();
         mesh.add(this.model);
@@ -557,7 +558,9 @@ export default class Game  {
           mesh.position.z = this.cubes[this.cubes.length - 1].position.z
           if (this.cubeStat.nextDir === 'left') {
             mesh.position.x = this.cubes[this.cubes.length - 1].position.x-4*Math.random() - 6
+            // this.jumper.rotation.y = Math.PI / 2
           } else {
+            // console.log(this.jumper.rotation.y)
             mesh.position.z = this.cubes[this.cubes.length - 1].position.z-4*Math.random() - 6
           }
         }
@@ -577,6 +580,7 @@ export default class Game  {
       _render () {
         this.renderer.render(this.scene, this.camera)
         this.snow.snowing(.3, .03)
+        // requestAnimationFrame(this._render)
         // console.log(1)
       }
       _setLight () {
