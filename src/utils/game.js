@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import Snow from "./snow";
+// import snowImg from "../textures/snow.png"
 export default class Game  {
   constructor() {
       this.config = {
@@ -18,14 +20,14 @@ export default class Game  {
           jumperHeight: 2, // jumper高度
           jumperDeep: 1, // jumper深度
       }
-
       this.score = 0
       this.size = {
         width: window.innerWidth,
         height: window.innerHeight
       }
       this.scene = new THREE.Scene()
- 
+      this.snow = new Snow(10000, 100, './textures/snow.png')
+      this.scene.add(this.snow.particle)
 
       this.cameraPos = {
         current: new THREE.Vector3(0, 0, 0), // 摄像机当前的坐标
@@ -49,7 +51,7 @@ export default class Game  {
       plane.position.z = 0;
       this.plane = plane;
       this.scene.add(this.plane);    // 将平面添加到场景
-      // this.scene.background = new THREE.Color(0x0000ff)
+      this.scene.background = new THREE.Color(0x0000ff)
 
 
       this.cubes = [] // 方块数组
@@ -578,6 +580,8 @@ export default class Game  {
       }
       _render () {
         this.renderer.render(this.scene, this.camera)
+        this.snow.snowing(.3, .03)
+        // console.log(1)
       }
       _setLight () {
         var light = new THREE.AmbientLight( 0xffffff, 0.3 )
@@ -609,16 +613,21 @@ export default class Game  {
         var config = this.config;
          // 所有的材质数组
         var materials = [
-          {
-            material : new THREE.MeshLambertMaterial({color: config.cubeColor}),
-            type: 'DefaultCubeColor'
-          },
-          RandomColor(),
-          clockMaterial(),
-          RadialGradient(),
-          RadialGradient2(),
+          // {
+          //   material : new THREE.MeshLambertMaterial({color: config.cubeColor}),
+          //   type: 'DefaultCubeColor'
+          // },
+          // RandomColor(),
+          // clockMaterial(),
+          // RadialGradient(),
+          // RadialGradient2(),
+          Chess(), 
           Chess(),
-          wireFrame(),
+          Chess(),
+          Chess(),
+          Chess(),
+          Chess(),
+          // wireFrame(),
         ];
     
         return function (idx) {
@@ -634,10 +643,11 @@ export default class Game  {
     
           // texture = new THREE.CanvasTexture(canvasTexture); // 此处的canvasTexture来自canvas.texture.js文件
           // texture.needsUpdate = true;
-    
+          const boxTextureLoader = new THREE.TextureLoader();
+          const boxTexture = boxTextureLoader.load('./bg.jpg');
           matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
           matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
-          // matArray.push(new THREE.MeshBasicMaterial({ map: texture }));
+          matArray.push(new THREE.MeshBasicMaterial({ map: boxTexture }));
           matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
           matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
           matArray.push(new THREE.MeshLambertMaterial({color: config.cubeColor}));
@@ -716,9 +726,9 @@ export default class Game  {
         }
     
         function Chess() {
-          var texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/Ovilia/ThreeExample.js/master/img/chess.png');
+          var texture = new THREE.TextureLoader().load('./ice.jpg');
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 指定重复方向为两个方向
-          texture.repeat.set(2, 2); // 设置重复次数都为4
+          texture.repeat.set(1, 1); // 设置重复次数
           return {
             material : new THREE.MeshBasicMaterial( { map: texture } ),
             type : 'Chess'
