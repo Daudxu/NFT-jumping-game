@@ -35,6 +35,7 @@ export default class Game  {
       }
       this.camera = new THREE.OrthographicCamera(this.size.width / -80, this.size.width / 80, this.size.height / 80, this.size.height / -80, 0, 5000)
       this.renderer = new THREE.WebGLRenderer({antialias: true})
+      this.renderer.outputEncoding = THREE.sRGBEncoding
       this.model = null
       const bgTextureLoader = new THREE.TextureLoader();
       const bgTexture = bgTextureLoader.load('./textures/bg.jpg');
