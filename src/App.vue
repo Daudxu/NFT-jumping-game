@@ -3,7 +3,26 @@
   <div class="cl-start-shade" v-if="isStart === 0">
      <div class="cl-start-main"> 
           <div class="cl-title"> jump</div>
+          <swiper
+            :effect="'cards'"
+            :grabCursor="true"
+            :modules="EffectCards"
+            @swiper="onSwiper"
+            @slideChange="onSlideChange"
+            class="mySwiper"
+          >
+            <swiper-slide>
+              <img src="@/assets/images/1.png" />
+            </swiper-slide>
+            <swiper-slide>
+              <img src="@/assets/images/2.png" />
+            </swiper-slide>
+            <swiper-slide>
+              <img src="@/assets/images/3.png" />
+            </swiper-slide>
+          </swiper>
           <div class="cl-button" @click="handleClickStart">start</div>
+          <!-- <div class="cl-button" @click="handleClickTest">start</div> -->
      </div>
   </div>
   <div class="cl-restart" v-if="isFail === 1">
@@ -19,24 +38,47 @@ import { onMounted, ref, computed } from 'vue'
 import Game from './utils/game'
 
 import Store from './store/index.js'
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { EffectCards } from 'swiper';
+import 'swiper/css/effect-cards';
 
+// Import Swiper styles
+import 'swiper/css';
 const Pinia  = Store()
 const scoreSum = computed(() => Pinia.useAppStore.getScore)
 const isStart = ref(0)
 const isFail = ref(0)
+const glbModelPath = ref("")
 const bgm = new Audio('./audio/bgm.mp3');
 const fallMusic = new Audio('./audio/fall.mp3');
-const game = new Game()
+let game 
 onMounted (()=>{
-  game.init()
-  game.addSuccessFn(success)
-  game.addFailedFn(failed)
-
   document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
   })
 })
 
+const onSwiper = (swiper) => {
+   glbModelPath.value = './1.glb'
+};
+
+const onSlideChange = (e) => {
+  let pageIndex = e.activeIndex;
+   switch (pageIndex) {
+      case 0:
+        glbModelPath.value = './1.glb'
+        break
+      case 1:
+        glbModelPath.value = './2.glb'
+        break
+      case 2:
+        glbModelPath.value = './3.glb'
+        break
+      default:
+        glbModelPath.value = './1.glb'
+        break
+   }
+};
 const success = (score) => {
   Pinia.useAppStore.setScore(score)
 }
@@ -50,6 +92,11 @@ const failed = () => {
 }
 
 const handleClickStart = () => {
+  console.log(glbModelPath.value);
+  game = new Game(glbModelPath.value)
+  game.init()
+  game.addSuccessFn(success)
+  game.addFailedFn(failed)
   isStart.value = 1
   audioBgm()
 }
@@ -65,6 +112,11 @@ const handleClickRestart = () => {
   game.restart()
   isFail.value = 0
   bgm.play();
+}
+
+const handleClickTest = () => {
+  // game.test()
+  // console.log(game)
 }
 
 </script>
@@ -114,6 +166,7 @@ const handleClickRestart = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 30px
   }
 }
 
@@ -211,5 +264,36 @@ a.title{
 	margin-top: 10px;
 	color: rgba(255,255,255,1);
 	font-size: 16px;
+}
+
+
+.swiper {
+  width: 240px;
+  height: 320px;
+}
+
+.swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  img {
+    width: 200px
+  }
+}
+
+.swiper-slide:nth-child(1n) {
+  background-color: rgb(0, 140, 255);
+}
+
+.swiper-slide:nth-child(2n) {
+  background-color: rgb(10, 184, 111);
+}
+
+.swiper-slide:nth-child(3n) {
+  background-color: rgb(118, 163, 12);
 }
 </style>

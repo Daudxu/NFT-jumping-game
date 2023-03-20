@@ -5,10 +5,11 @@ import Snow from "./snow";
 import { IS_HELPER, BACKGROUND, GROUND, FALLING_SPEED, CUBE_COLOR, CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEEP, JUMPER_WIDTH } from "../config/settings";
 // import snowImg from "../textures/snow.png"
 export default class Game  {
-  constructor() {
+  constructor(modelPath) {
       this.config = {
           isMobile: false,
       }
+      this.modelPath = modelPath
       this.score = 0
       this.size = {
         width: window.innerWidth,
@@ -48,7 +49,6 @@ export default class Game  {
       this.plane = plane;
       this.scene.add(this.plane);    // 将平面添加到场景
       this.scene.background = new THREE.Color(0x0000ff)
-
 
       this.cubes = [] // 方块数组
       this.cubeStat = {
@@ -501,14 +501,16 @@ export default class Game  {
         dracoLoader.setDecoderConfig({type: "js"});
         let loader = new  GLTFLoader();
         loader.setDRACOLoader(loader);
+        console.log(1111)
         var objModel =  new Promise((resolve, reject) =>{
-          loader.load("./1.glb", (gltf) => {
+          loader.load(this.modelPath, (gltf) => {
+            
               gltf.scene.traverse(c => {
                   c.castShadow = true;
               });
               gltf.scene.scale.set(2.2, 2.2, 2.2)
               gltf.scene.position.set(0, 0, 0)
-              gltf.scene.rotation.y = Math.PI 
+              gltf.scene.rotation.y = Math.PI / -2
               const clip = gltf.animations[0]
               const mixer = new THREE.AnimationMixer(gltf.scene)
               mixer.timeScale=1/5;
@@ -772,4 +774,5 @@ export default class Game  {
         }
         return obj;
       }
+
 }
