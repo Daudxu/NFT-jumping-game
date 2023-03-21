@@ -21,11 +21,14 @@ jobs:
         with:
           node-version: 16.13.1
       # 安装依赖
-      - name: npm  install
-        run: npm install
+      - name: npm  install yarn
+        run: npm install yarn
+    # 安装依赖
+      - name: yarn  install
+        run: yarn install
       # 打包
-      - name: npm run build
-        run: npm run build
+      - name: yarn run build
+        run: yarn run build
       # 执行JamesIves/github-pages-deploy-action将项目发布到Github Pages
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
