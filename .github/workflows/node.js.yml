@@ -1,4 +1,4 @@
-name: Build app and deploy to aliyun
+name: Build app and deploy 
 on:
   #监听push操作
   push:
@@ -13,7 +13,7 @@ jobs:
       # 获取源码
       - name: Checkout
         # 使用action库  actions/checkout获取源码
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3  
       # 安装Node13
       - name: use Node.js 16.13.1
         # 使用action库  actions/setup-node安装node
