@@ -16,8 +16,8 @@ jobs:
         node-version: 16.13.1
     - name: 🌈 npm  install
       run: npm install
-    - name: 🌏 npm run build-static
-      run: npm run build-static
+    - name: 🌏 npm run build
+      run: npm run build
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
