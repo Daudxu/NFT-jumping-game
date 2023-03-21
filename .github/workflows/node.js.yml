@@ -1,40 +1,22 @@
 name: Build app and deploy 
 on:
-  #监听push操作
   push:
     branches:
-      # master分支，你也可以改成其他分支
-      - master
+      - devel
 jobs:
-  build:
-
+  build-deploy-job:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+    - name: 🚜 use Node.js 16.13.1
+      uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-
-    # 安装依赖
-    - name: npm  install yarn
-      run: npm install yarn
-  # 安装依赖
-    - name: yarn  install
-      run: yarn install
-    # 打包
-    - name: yarn run build
-      run: yarn run build
+        node-version: 16.13.1
+    - name: 🌈 npm  install
+      run: npm install
+    - name: npm run build
+      run: npm run build
     # 执行JamesIves/github-pages-deploy-action将项目发布到Github Pages
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@3.7.1
