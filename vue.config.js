@@ -1,6 +1,6 @@
 
 module.exports = {
   lintOnSave: false,
-  publicPath: './NFT-jumping-game/',
+  publicPath: './',
   assetsDir: 'static'
 }
